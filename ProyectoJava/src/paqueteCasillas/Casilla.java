@@ -97,6 +97,7 @@ public class Casilla {
         }
     }
     //Sobrecarga del constructor para solar:
+
     public Casilla(String nombreCasilla, int numCasilla, String tipocasilla, String colorSolar) {
 
         setNombreCasilla(nombreCasilla);
@@ -162,7 +163,7 @@ public class Casilla {
                 System.out.println("Eres el propietario de esta casilla.");
             }
             //IMPRIMIR MENU CASILLAS COMPRABLES
-            Menu.menuCasillasComprables(estadoPartida, jugador, propietarioCheck);
+            Menu.menuModularizado(estadoPartida, jugador, "menuCasillasComprables",propietarioCheck);
         }
         //COMPROBAR SI LA CASILLA ES DEL TIPO TRANSPORTE
         if(casilla.getGrupoCasilla().equals("Transporte")) {
@@ -185,7 +186,7 @@ public class Casilla {
                 System.out.println("Eres el propietario de esta casilla.");
             }
             //IMPRIMIR MENU CASILLAS COMPRABLES
-            Menu.menuCasillasComprables(estadoPartida, jugador, propietarioCheck);
+            Menu.menuModularizado(estadoPartida, jugador, "menuCasillasComprables",propietarioCheck);
         }
         //COMPROBAR SI LA CASILLA ES DEL TIPO SERVICIOS
         if(casilla.getGrupoCasilla().equals("Servicios")) {
@@ -206,7 +207,7 @@ public class Casilla {
                 System.out.println("Eres el propietario de esta casilla.");
             }
             //IMPRIMIR MENU CASILLAS COMPRABLES
-            Menu.menuCasillasComprables(estadoPartida, jugador, propietarioCheck);
+            Menu.menuModularizado(estadoPartida, jugador, "menuCasillasComprables",propietarioCheck);
         }
         //COMPROBAR SI LA CASILLA ES DEL TIPO IMPUESTO
         if(casilla.getGrupoCasilla().equals("Impuestos")){
@@ -214,7 +215,7 @@ public class Casilla {
             System.out.println("Has caído en la casilla " + casilla.getNombreCasilla() + ".");
             //PAGAR MULTA
             casilla.getGrupoImpuesto().cobrarMulta(casilla.getGrupoImpuesto().getMulta(), jugador);
-            Menu.menuCasillasNoComprables(estadoPartida, jugador);
+            Menu.menuModularizado(estadoPartida, jugador, "menuCasillasNoComprables", false);
         }
 
         //COMPROBAR SI LA CASILLA ES DEL TIPO PARKING
@@ -223,7 +224,7 @@ public class Casilla {
             System.out.println("Has caído en la casilla " + casilla.getNombreCasilla() + ".");
             //COBRAR BOTE
             casilla.getGrupoParking().cobrarBote(jugador);
-            Menu.menuCasillasNoComprables(estadoPartida, jugador);
+            Menu.menuModularizado(estadoPartida, jugador, "menuCasillasNoComprables", false);
         }
 
         //COMPROBAR SI LA CASILLA ES DEL TIPO SALIDA, CAJA COMUNIDAD O SUERTE
@@ -231,7 +232,7 @@ public class Casilla {
             //PRINTEAMOS EL NOMBRE DE LA CASILLA
             System.out.println("Has caído en la casilla " + casilla.getNombreCasilla() + ".");
             //IMPRIMIR MENU CASILLAS NO COMPRABLES
-            Menu.menuCasillasNoComprables(estadoPartida, jugador);
+            Menu.menuModularizado(estadoPartida, jugador, "menuCasillasNoComprables", false);
         }
 
         //COMPROBAR SI LA CASILLA ES DEL TIPO IR A LA CARCEL

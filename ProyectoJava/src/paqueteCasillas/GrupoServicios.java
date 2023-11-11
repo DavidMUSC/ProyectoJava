@@ -77,11 +77,13 @@ public class GrupoServicios {
 
     //METODO PARA COBRAR EL ALQUILER
     public void cobrarAlquiler(Jugador jugador){
+        Jugador jugadorAux = getPropietario();
         //checkeo de si se puede pagar o no
         if(jugador.getDinero() - getAlquiler() < 0){
             jugador.noDinero();
         }
         jugador.setDinero(jugador.getDinero() - getAlquiler());
+        jugadorAux.setDinero(jugadorAux.getDinero() + getAlquiler());
     }
 
     //METODO PARA COMPRAR UN SERVICIO

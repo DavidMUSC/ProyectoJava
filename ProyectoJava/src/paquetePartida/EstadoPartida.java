@@ -167,7 +167,7 @@ public class EstadoPartida {
                 if (jugador.getTurnosCarcel()!=0){
                     GrupoIrCarcel.irACarcel(this.getTablero(),jugador,this.getTablero().getCasilla(0).getGrupoSalida().getCantidadPorVuelta());
                 }else{
-                    Menu.menuPreLanzarDados(this,jugador);
+                    Menu.menuModularizado(this,jugador,"menuPreLanzarDados", false);
                 }
                 jugadorSiguiente(jugador);
                 contador++;
@@ -220,17 +220,21 @@ public class EstadoPartida {
     }
 
     //METODO AUXILIAR para mover un juegador un numero de casillas determinado
-    public static void moverJugador(Jugador jugador, int casillas, Tablero tablero1){
+    public static void moverJugador(Jugador jugador, int casillas, Tablero tablero){
 
         //Variables
         int posicionActual = jugador.getCasillaDeJugador().getNumCasilla();
-
         int posicionNueva = (posicionActual + casillas) % 40;
 
-        jugador.setCasillaDeJugador(tablero1.getCasilla(posicionNueva));
+        jugador.setCasillaDeJugador(tablero.getCasilla(posicionNueva));
         //MOVER AVATAR EN EL TABLERO A LA NUEVA CASILLA
-        jugador.cambiarCasillaAvatar(tablero1.getCasilla(posicionNueva));
-
+        jugador.cambiarCasillaAvatar(tablero.getCasilla(posicionNueva));
+        //ACTUALIZO EL INDICE DE LOS DADOS
+        int indiceDados = jugador.incrementarIndiceDados(casillas);
+        if (indiceDados>=40){
+            tablero.getCasilla(0).getGrupoSalida().completarVuelta(jugador);
+            tablero.getCasilla(0).getGrupoSalida().aumentarPreciosCompraSolares(jugador,tablero);
+        }
 
     }
 
@@ -261,7 +265,12 @@ public class EstadoPartida {
         System.out.println("El jugador " + jugador.getNombre() + " ha sacado " + dado1 + " y " + dado2 + ", avanzando " + total + " posiciones.");
         //Mover avatar
         moverJugador(jugador, total, this.tablero);
+
+        //DADOS ACTUALIZAR EL ARRAY DE CONTADORES DE CASILLAS EN LAS QUE CAE EL JUGADOR
+        jugador.actualizarCasillasPasadas(jugador.getCasillaDeJugador());
+
         Casilla.realizarAccionesCasilla(this,jugador.getCasillaDeJugador(), jugador);
+
         //COMPROBACION DE SI SALEN DOBLES VOLVER A TIRAR, REALIZAR ACCIONES CASILLA Y SI SALE TERCERA VEZ IR A LA CARCEL
         if(dado1==dado2){
             //Printear que el jugador saco dobles
@@ -274,6 +283,8 @@ public class EstadoPartida {
             total = dado1 + dado2;
             System.out.println("El jugador " + jugador.getNombre() + " ha sacado " + dado1 + " y " + dado2 + ", avanzando " + total + " posiciones.");
             moverJugador(jugador, total, this.tablero);
+            //DADOS ACTUALIZAR EL ARRAY DE CONTADORES DE CASILLAS EN LAS QUE CAE EL JUGADOR
+            jugador.actualizarCasillasPasadas(jugador.getCasillaDeJugador());
             Casilla.realizarAccionesCasilla(this,jugador.getCasillaDeJugador(), jugador);
             if(dado1==dado2){
                 //Printear que el jugador saco dobles
@@ -295,12 +306,13 @@ public class EstadoPartida {
                     total = dado1 + dado2;
                     System.out.println("El jugador " + jugador.getNombre() + " ha sacado " + dado1 + " y " + dado2 + ", avanzando " + total + " posiciones.");
                     moverJugador(jugador, total, this.tablero);
+                    //DADOS ACTUALIZAR EL ARRAY DE CONTADORES DE CASILLAS EN LAS QUE CAE EL JUGADOR
+                    jugador.actualizarCasillasPasadas(jugador.getCasillaDeJugador());
                     Casilla.realizarAccionesCasilla(this,jugador.getCasillaDeJugador(), jugador);
                 }
 
             }
         }
-
     }
 
     //MÉTODO LISTAR PROPIEDADES EN VENTA
@@ -424,7 +436,7 @@ public class EstadoPartida {
             System.out.println("{\n\ttipo: " + casillaAux.getGrupoCasilla() + ",\n\tcolor: " +
                     casillaAux.getGrupoSolar().getColorSolar() + ",\n\tpropietario: " +
                     casillaAux.getGrupoSolar().getPropietario().getNombre() + ",\n\tvalor: " + casillaAux.getGrupoSolar().getValor()
-                    + ",\n\talquiler: " + casillaAux.getGrupoSolar().getAlquiler() + stringAux + ",\n},\n");
+                    + ",\n\talquiler: " + casillaAux.getGrupoSolar().getAlquilerActualizado() + stringAux + ",\n},\n");
         }
 
         //SERVICIOS
@@ -481,21 +493,6 @@ public class EstadoPartida {
             //DESCRIBIMOS:      //FALTA PONER LOS JUGADORES QUE ESTAN EN LA CARCEL - ??ATRIBUTO DE JUGADOR??
             System.out.println("{\n\ttipo: " + casillaAux.getGrupoCasilla() + stringAux  + ",\n},\n");
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
     //MÉTODO DESCRIBIR UN JUGADOR

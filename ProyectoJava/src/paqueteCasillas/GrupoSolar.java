@@ -1,6 +1,8 @@
 package paqueteCasillas;
 
+import java.util.ArrayList;
 import java.util.Scanner;
+
 import paquetePartida.Jugador;
 import paquetePartida.EstadoPartida;
 
@@ -12,7 +14,7 @@ public class GrupoSolar {
     private Jugador propietario;
     private int valor;
     private int alquiler; //debe ser 10% de precio inicial
-    //el resto de atributos no hacen falta en esta entrega
+    private Edificaciones edificaciones;
 
 
     //GETTERS
@@ -28,6 +30,9 @@ public class GrupoSolar {
     }
     public int getAlquiler() {
         return alquiler;
+    }
+    public Edificaciones getEdificaciones() {
+        return edificaciones;
     }
 
 
@@ -47,6 +52,9 @@ public class GrupoSolar {
     public void setValor(int valor) {
         this.valor = valor;
     }
+    public void setEdificaciones(Edificaciones edificaciones) {
+        this.edificaciones = edificaciones;
+    }
 
 
 
@@ -57,7 +65,7 @@ public class GrupoSolar {
         setCasilla(casilla);
         setColorSolar(color);
         setPropietario(EstadoPartida.getBanca());   //----------- BANCA ------------------------
-
+        edificaciones = new Edificaciones(this);
         //Método para calcular el valor:
         valorPorColor(color);
     }
@@ -150,8 +158,11 @@ public class GrupoSolar {
                 jugador.setDinero(jugador.getDinero() - getValor());
                 jugador.anadirPropiedad(casilla);
                 setPropietario(jugador);
-                System.out.println("Has comprado la casilla " + getCasilla().getNombreCasilla() + " por " +
-                        getValor() + " €\n");
+                System.out.println("Has comprado la casilla " + getCasilla().getNombreCasilla() + " por " + getValor() + " €\n");
+                //Checkear si tienen monopolio con calcularMonopolio. Si hay nuevo monopolio se imprime, y si no no
+                if (jugador.calcularMonopolio() == 1) {
+                    System.out.print("¡¡¡ENHORABUENA!!! Has conseguido un monopolio de color " + getColorSolar() + "\n");
+                }
             }
 
         }
@@ -163,15 +174,88 @@ public class GrupoSolar {
     //MÉTODO COBRAR ALQUILER
     public void pagarAlquiler(Jugador jugador){
 
+        //Variable
+        int alquilerActualizado = getAlquilerActualizado();
+        Jugador jugadorPropietario = this.getPropietario();
+
         //Chequeo que se pueda pagar o no:
-        if((jugador.getDinero() - getAlquiler()) < 0){
+        if((jugador.getDinero() - alquilerActualizado) < 0){
             jugador.noDinero();
             return;
         }
 
-        jugador.setDinero(jugador.getDinero() - getAlquiler());
+        //Restamos el dinero al jugador que paga
+        jugador.setDinero(jugador.getDinero() - alquilerActualizado);
 
+        //Sumamos el dinero al jugador propietario:
+        jugadorPropietario.setDinero(jugadorPropietario.getDinero() + alquilerActualizado);
     }
+
+
+    //MÉTODO GET ALQUILER ACTUALIZADO
+    public int getAlquilerActualizado(){
+
+        //Variable:
+        int alquiler = getAlquiler();
+        int alquilerActualizado = 0;
+
+        int numCasas = getEdificaciones().getNumCasas();
+        int numHoteles = getEdificaciones().getNumHoteles();
+        int numPiscinas = getEdificaciones().getNumPiscinas();
+        int numPistasDeporte = getEdificaciones().getNumPistasDeporte();
+
+        //ACTUALIZAMOS ALQUIER DEPENDIENDO DE CIRCUNSTANCIA
+
+        //MONOPOLIO (x2)
+        if(this.getPropietario().getMonopolioColor() == null){ //No se puede usar .equals con null
+            return alquiler;
+        }
+
+        if (this.getPropietario().getMonopolioColor().contains(this.getColorSolar())){
+            alquilerActualizado = alquiler * 2;
+        }
+
+        //EDIFICACIONES (lo haremos mas adelante):
+
+        //CASA:
+        switch(numCasas){
+            //0:
+            default:
+                break;
+            //1: 5x alquiler inicial
+            case 1:
+                alquilerActualizado += alquiler*5;
+                break;
+            //2: 15x alquiler inicial
+            case 2:
+                alquilerActualizado += alquiler*15;
+                break;
+            //3: 35x alquiler inicial
+            case 3:
+                alquilerActualizado += alquiler*35;
+                break;
+            //4: x50 alquiler inicial
+            case 4:
+                alquilerActualizado += alquiler*50;
+                break;
+        }
+
+        //HOTEL
+        //x70 alquiler inicial
+        alquilerActualizado += alquiler * numHoteles * 70;
+
+        //PISCINA
+        //x25 alquiler inicial
+        alquilerActualizado += alquiler * numPiscinas * 25;
+
+        //PISTA DE DEPORTE
+        //x25 alquiler inicial
+        alquilerActualizado += alquiler * numPistasDeporte * 25;
+
+        //Devolvemos el alquiler actualizado.
+        return alquilerActualizado;
+    }
+
 
 
 

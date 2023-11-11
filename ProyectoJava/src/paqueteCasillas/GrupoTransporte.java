@@ -120,13 +120,14 @@ public class GrupoTransporte {
     public void cobrarAlquiler(Jugador jugador){
 
         //Actualizamos el coste de alquiler
-
+        Jugador jugadorAux = getPropietario();
         //Chequeo que se pueda pagar o no:
         if(jugador.getDinero() - getAlquiler() < 0){
             jugador.noDinero();
         }
 
         jugador.setDinero(jugador.getDinero() - getAlquiler());
+        jugadorAux.setDinero(jugadorAux.getDinero() + getAlquiler());
         //PRINTEAR QUE SE HA PAGADO EL ALQUILER
         System.out.println("Has pagado " + getAlquiler() + " € de alquiler a " + getPropietario().getNombre());
 
