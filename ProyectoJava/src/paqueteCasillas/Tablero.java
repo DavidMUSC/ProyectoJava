@@ -329,4 +329,60 @@ public class Tablero {
         return casillaSalida.getGrupoSalida().getCantidadPorVuelta();
     }
 
+    //Método para saber cual es la casilla más rentable es decir la que tiene el dineroRecaudado más alto
+    public Casilla casillaMasRentable(){
+        //Variables
+        int dineroRecaudado = 0;
+        Casilla casillaMasRentable = null;
+
+        //For-each
+        for (Casilla casilla : casillasTablero) {
+            if (casilla.getGrupoCasilla().equals("Solar")) {
+                if (casilla.getGrupoSolar().getDineroRecaudado() > dineroRecaudado) {
+                    dineroRecaudado = casilla.getGrupoSolar().getDineroRecaudado();
+                    casillaMasRentable = casilla;
+                }
+                if(casilla.getGrupoCasilla().equals("Transporte")){
+                    dineroRecaudado = casilla.getGrupoSolar().getDineroRecaudado();
+                    casillaMasRentable = casilla;
+                }
+                if(casilla.getGrupoCasilla().equals("Servicios")){
+                    dineroRecaudado = casilla.getGrupoSolar().getDineroRecaudado();
+                    casillaMasRentable = casilla;
+                }
+            }
+        }
+        return casillaMasRentable;
+    }
+
+    //Método para saber cual es el grupo más rentable
+    public String grupoMasRentable(){
+        //Variables
+        int dineroRecaudado = 0;
+        String grupoMasRentable = null;
+
+        //For-each
+        for (Casilla casilla : casillasTablero) {
+            if (casilla.getGrupoCasilla().equals("Solar")) {
+                if (casilla.getGrupoSolar().getDineroRecaudado() > dineroRecaudado) {
+                    dineroRecaudado = casilla.getGrupoSolar().getDineroRecaudado();
+                    grupoMasRentable = casilla.getGrupoSolar().getColorSolar();
+                }
+            }
+            if(casilla.getGrupoCasilla().equals("Transporte")){
+                if(casilla.getGrupoTransporte().getDineroRecaudado()>dineroRecaudado){
+                    dineroRecaudado = casilla.getGrupoTransporte().getDineroRecaudado();
+                    grupoMasRentable = "Transporte";
+                }
+            }
+            if (casilla.getGrupoCasilla().equals("Servicios")){
+                if(casilla.getGrupoServicios().getDineroRecaudado()>dineroRecaudado){
+                    dineroRecaudado = casilla.getGrupoServicios().getDineroRecaudado();
+                    grupoMasRentable = "Servicios";
+                }
+            }
+        }
+        return grupoMasRentable;
+    }
+
 }

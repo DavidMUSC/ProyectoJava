@@ -26,9 +26,9 @@ public class GrupoIrCarcel{
 
     // OTROS MÉTODOS
     // Método para permitir al jugador salir de la Cárcel
-    public static void irACarcel(Tablero tablero, Jugador jugador, int cantidadPorVuelta ) {
+    public static void irACarcel(EstadoPartida estadoPartida, Jugador jugador, int cantidadPorVuelta ) {
 
-        Casilla casillaCarcel = tablero.getCarcel(); //Movemos el avatar a la casilla de la carcel
+        Casilla casillaCarcel = estadoPartida.getTablero().getCarcel(); //Movemos el avatar a la casilla de la carcel
         Scanner scanner = new Scanner(System.in);
         int flag = 0;
 
@@ -36,7 +36,11 @@ public class GrupoIrCarcel{
         int valorDados=0;
         int cantidadDinero = cantidadDinero(cantidadPorVuelta); //Calculamos el precio de la multa
         //Mover jugador de la casilla irCarcel a carcel
-        EstadoPartida.moverJugador(jugador, 20,tablero);
+        jugador.incrementarIndiceDados(-40); //Estoy en 30, me voy a mover 20, resto 40 para estar en 10
+        EstadoPartida.moverJugador(jugador, 20,estadoPartida);
+
+        //estadística cantidad de veces que se ha ido a la cárcel
+        jugador.setVecesCarcel(jugador.getVecesCarcel()+1);
 
         while(flag==0){
             //MENU PARA QUE EL JUGADOR ELIJA QUE QUIERA HACER
@@ -85,7 +89,7 @@ public class GrupoIrCarcel{
                     if (dobles) {
                         System.out.println(jugador.getNombre() + " ha sacado dobles y ha salido de la Cárcel.");
                         // Mover el avatar fuera de la Cárcel
-                        EstadoPartida.moverJugador(jugador,valorDados,tablero);
+                        EstadoPartida.moverJugador(jugador,valorDados,estadoPartida);
                         jugador.setTurnosCarcel(0);
                     }
                     else {

@@ -1,5 +1,6 @@
 package paqueteCasillas;
 
+import paquetePartida.EstadoPartida;
 import paquetePartida.Jugador;
 
 public class GrupoImpuesto {
@@ -49,13 +50,15 @@ public class GrupoImpuesto {
     }
 
     //MÉTODO PARA COBRAR LA MULTA
-    public void cobrarMulta(int multa, Jugador jugador){
+    public void cobrarMulta(EstadoPartida estadoPartida,int multa, Jugador jugador){
         //Imprimir el precio de la multa
         System.out.println("El precio de la multa es: " + multa);
         //checkeo de si puede pagar o no
         if(jugador.getDinero() - multa < 0){
             jugador.noDinero();
         }else{
+            //estadisticas PagoTasasEImpuestos
+            jugador.setPagoTasasEImpuestos(jugador.getPagoTasasEImpuestos() + multa);
             jugador.setDinero(jugador.getDinero() - multa);
             contabilizarMulta(multa);
             //Imprimir que ha pagado la multa y el dinero que le queda

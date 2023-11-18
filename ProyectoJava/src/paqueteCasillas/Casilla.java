@@ -14,9 +14,8 @@ public class Casilla {
     private GrupoServicios grupoServicios;
     private GrupoTransporte grupoTransporte;
     private GrupoIrCarcel grupoIrCarcel;
-    private GrupoCajaComunidad grupoCajaComunidad;
+    private GrupoComunidadSuerte grupoComunidadSuerte;
     private GrupoSalida grupoSalida;
-    private GrupoSuerte grupoSuerte;
     private GrupoParking grupoParking;
     private GrupoImpuesto grupoImpuesto;
     private String colorSolar;
@@ -34,8 +33,8 @@ public class Casilla {
     public GrupoIrCarcel getGrupoIrCarcel() {
         return grupoIrCarcel;
     }
-    public GrupoCajaComunidad getGrupoCajaComunidad() {
-        return grupoCajaComunidad;
+    public GrupoComunidadSuerte getGrupoComunidadSuerte() {
+        return grupoComunidadSuerte;
     }
     public GrupoSalida getGrupoSalida() {
         return grupoSalida;
@@ -54,9 +53,6 @@ public class Casilla {
     }
     public GrupoParking getGrupoParking() {
         return grupoParking;
-    }
-    public GrupoSuerte getGrupoSuerte(){
-        return grupoSuerte;
     }
     public String getColorSolar(){
         return colorSolar;
@@ -84,14 +80,9 @@ public class Casilla {
         if (tipocasilla.equals("IrCarcel")) {
             this.grupoIrCarcel = new GrupoIrCarcel(this);
         }
-        if (tipocasilla.equals("CajaComunidad")) {
-            this.grupoCajaComunidad = new GrupoCajaComunidad(this);
+        if (tipocasilla.equals("CajaComunidad") || tipocasilla.equals("Suerte")) {
+            this.grupoComunidadSuerte = new GrupoComunidadSuerte(this);
         }
-        if (tipocasilla.equals("Suerte")) {
-            this.grupoSuerte = new GrupoSuerte(this);
-        }
-
-
         if (tipocasilla.equals("Parking")) {
             this.grupoParking = new GrupoParking(this);
         }
@@ -153,17 +144,27 @@ public class Casilla {
 
             //COMPROBAR SI LA CASILLA TIENE PROPIETARIO SI LO TIENE SE PAGA EL ALQUILER
             if ((!propietario.getNombre().equals("Banca")) && (!propietario.equals(jugador))) {
-                casilla.getGrupoSolar().pagarAlquiler(jugador);
-                //Printear la cantidad que se ha pagado y a quien se ha pagado
-                System.out.println("Has pagado " + casilla.getGrupoSolar().getAlquiler() + " a " + propietario.getNombre() + ".");
-                propietarioCheck= true;
-            }
-            else if(propietario == jugador){
-                propietarioCheck= true;
+                //Si esta hipotecada, no se cobrará el alquiler.
+                if (casilla.getGrupoSolar().getEsHipotecada()){
+                    System.out.println("Este solar pertenece a " + propietario.getNombre() + ", pero al estar" +
+                            " hipotecada no se te ha cobrado el alquiler.");
+                }
+                else{
+                    casilla.getGrupoSolar().pagarAlquiler(estadoPartida, jugador);
+                    //Printear la cantidad que se ha pagado y a quien se ha pagado
+                    System.out.println("Has pagado " + casilla.getGrupoSolar().getAlquilerActualizado() + " a " + propietario.getNombre() + ".");
+                }
+                propietarioCheck = true;
+            } else if (propietario == jugador) {
+                propietarioCheck = true;
                 System.out.println("Eres el propietario de esta casilla.");
             }
             //IMPRIMIR MENU CASILLAS COMPRABLES
-            Menu.menuModularizado(estadoPartida, jugador, "menuCasillasComprables",propietarioCheck);
+            if(jugador.getComproCasillaTurno()==1){
+                Menu.menuModularizado(estadoPartida, jugador, "menuCasillasNoComprables",propietarioCheck);
+            }else
+                Menu.menuModularizado(estadoPartida, jugador, "menuCasillasComprables",propietarioCheck);
+
         }
         //COMPROBAR SI LA CASILLA ES DEL TIPO TRANSPORTE
         if(casilla.getGrupoCasilla().equals("Transporte")) {
@@ -186,8 +187,12 @@ public class Casilla {
                 System.out.println("Eres el propietario de esta casilla.");
             }
             //IMPRIMIR MENU CASILLAS COMPRABLES
-            Menu.menuModularizado(estadoPartida, jugador, "menuCasillasComprables",propietarioCheck);
+            if(jugador.getComproCasillaTurno()==1){
+                Menu.menuModularizado(estadoPartida, jugador, "menuCasillasNoComprables",propietarioCheck);
+            }else
+                Menu.menuModularizado(estadoPartida, jugador, "menuCasillasComprables",propietarioCheck);
         }
+
         //COMPROBAR SI LA CASILLA ES DEL TIPO SERVICIOS
         if(casilla.getGrupoCasilla().equals("Servicios")) {
 
@@ -207,14 +212,17 @@ public class Casilla {
                 System.out.println("Eres el propietario de esta casilla.");
             }
             //IMPRIMIR MENU CASILLAS COMPRABLES
-            Menu.menuModularizado(estadoPartida, jugador, "menuCasillasComprables",propietarioCheck);
+            if(jugador.getComproCasillaTurno()==1){
+                Menu.menuModularizado(estadoPartida, jugador, "menuCasillasNoComprables",propietarioCheck);
+            }else
+                Menu.menuModularizado(estadoPartida, jugador, "menuCasillasComprables",propietarioCheck);
         }
         //COMPROBAR SI LA CASILLA ES DEL TIPO IMPUESTO
         if(casilla.getGrupoCasilla().equals("Impuestos")){
             //PRINTEAMOS EL NOMBRE DE LA CASILLA
             System.out.println("Has caído en la casilla " + casilla.getNombreCasilla() + ".");
             //PAGAR MULTA
-            casilla.getGrupoImpuesto().cobrarMulta(casilla.getGrupoImpuesto().getMulta(), jugador);
+            casilla.getGrupoImpuesto().cobrarMulta(estadoPartida,casilla.getGrupoImpuesto().getMulta(), jugador);
             Menu.menuModularizado(estadoPartida, jugador, "menuCasillasNoComprables", false);
         }
 
@@ -228,7 +236,7 @@ public class Casilla {
         }
 
         //COMPROBAR SI LA CASILLA ES DEL TIPO SALIDA, CAJA COMUNIDAD O SUERTE
-        if(casilla.getGrupoCasilla().equals("Salida") || casilla.getGrupoCasilla().equals("CajaComunidad") || casilla.getGrupoCasilla().equals("Suerte")|| casilla.getNumCasilla()==10){
+        if(casilla.getGrupoCasilla().equals("Salida") || casilla.getNumCasilla()==10){
             //PRINTEAMOS EL NOMBRE DE LA CASILLA
             System.out.println("Has caído en la casilla " + casilla.getNombreCasilla() + ".");
             //IMPRIMIR MENU CASILLAS NO COMPRABLES
@@ -241,7 +249,23 @@ public class Casilla {
             System.out.println("Has caído en la casilla " + casilla.getNombreCasilla() + ".");
             jugador.setTurnosCarcel(3);
             //IR A LA CARCEL
-            GrupoIrCarcel.irACarcel(estadoPartida.getTablero(),jugador,estadoPartida.getTablero().getCasilla(0).getGrupoSalida().getCantidadPorVuelta());
+            GrupoIrCarcel.irACarcel(estadoPartida,jugador,estadoPartida.getTablero().getCasilla(0).getGrupoSalida().getCantidadPorVuelta());
+        }
+
+        //COMPROBAR SI LA CASILLA ES DEL TIPO COMUNIDAD
+        if(casilla.getGrupoCasilla().equals("CajaComunidad")){
+            //realizar acciones carta
+            casilla.getGrupoComunidadSuerte().accionCarta(estadoPartida,jugador,'C');
+            //IMPRIMIR MENU CASILLAS NO COMPRABLES
+            Menu.menuModularizado(estadoPartida, jugador, "menuCasillasNoComprables", false);
+        }
+
+        //COMPROBAR SI LA CASILLA ES DEL TIPO SUERTE
+        if(casilla.getGrupoCasilla().equals("Suerte")){
+            //realizar acciones carta
+            casilla.getGrupoComunidadSuerte().accionCarta(estadoPartida,jugador,'S');
+            //IMPRIMIR MENU CASILLAS NO COMPRABLES
+            Menu.menuModularizado(estadoPartida, jugador, "menuCasillasNoComprables", false);
         }
     }
 }

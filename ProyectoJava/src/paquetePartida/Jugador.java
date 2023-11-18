@@ -21,12 +21,19 @@ public class Jugador {
     private int TurnosCarcel;
     private ArrayList<String> monopolioColor;
     private ArrayList<Integer> casillasPasadas;
-    private HashMap<String, Edificaciones> edificacionesMonopolio;
-    private String[] hipotecas; //ATRIBUTO HIPOTECAS
-    private String[] edificios; //ATRIBUTO EDIFICIOS
     private boolean tieneCartaSuerte = false;
     private int vueltasCompletadas;
     private int indiceDados;
+    private int dineroInvertido;
+    private int pagoTasaseImpuestos;
+    private int pagoAlquileres;
+    private int cobroAlquileres;
+    private int cobroPremiosOBote;
+    private int pasarPorCasillaSalida;
+    private int vecesCarcel;
+    private int vecesDados;
+    private int fortunaTotal;
+    private int comproCasillaTurno;
 
     //CASILLA ACTUAL NO HACE FALTA PORQ YA ESTÁ EN AVATAR
     //TIPO AVATAR TAMPOCO HACE FALTA PORQ YA ESTÁ EN AVATAR
@@ -43,14 +50,6 @@ public class Jugador {
 
     public int getDinero() {
         return this.dinero;
-    }
-
-    public String[] getHipotecas() {
-        return hipotecas;
-    }
-
-    public String[] getEdificios() {
-        return edificios;
     }
 
     public Avatar getAvatar() {
@@ -90,6 +89,36 @@ public class Jugador {
         return propiedades;
     }
 
+    public int getDineroInvertido(){
+        return dineroInvertido;
+    }
+    public int getPagoTasasEImpuestos(){
+        return pagoTasaseImpuestos;
+    }
+    public int getPagoAlquileres(){
+        return pagoAlquileres;
+    }
+    public int getCobroAlquileres(){
+        return cobroAlquileres;
+    }
+    public int getCobroPremiosOBote(){
+        return cobroPremiosOBote;
+    }
+    public int getPasarPorCasillaSalida(){
+        return pasarPorCasillaSalida;
+    }
+    public int getVecesCarcel(){
+        return vecesCarcel;
+    }
+    public int getVecesDados(){
+        return vecesDados;
+    }
+    public int getFortunaTotal(){
+        return fortunaTotal;
+    }
+    public int getComproCasillaTurno(){
+        return comproCasillaTurno;
+    }
 
     //SETTERS
 
@@ -126,7 +155,36 @@ public class Jugador {
     public void setIndiceDados(int indiceDados){
         this.indiceDados = indiceDados;
     }
-
+    public void setDineroInvertido(int dineroInvertido){
+        this.dineroInvertido = dineroInvertido;
+    }
+    public void setPagoTasasEImpuestos(int pagoTasaseImpuestos){
+        this.pagoTasaseImpuestos = pagoTasaseImpuestos;
+    }
+    public void setPagoAlquileres(int pagoAlquileres){
+        this.pagoAlquileres = pagoAlquileres;
+    }
+    public void setCobroAlquileres(int cobroAlquileres){
+        this.cobroAlquileres = cobroAlquileres;
+    }
+    public void setCobroPremiosOBote(int cobroPremiosOBote){
+        this.cobroPremiosOBote = cobroPremiosOBote;
+    }
+    public void setPasarPorCasillaSalida(int pasarPorCasillaSalida){
+        this.pasarPorCasillaSalida = pasarPorCasillaSalida;
+    }
+    public void setVecesCarcel(int vecesCarcel){
+        this.vecesCarcel = vecesCarcel;
+    }
+    public void setVecesDados(int vecesDados){
+        this.vecesDados = vecesDados;
+    }
+    public void setFortunaTotal(int fortunaTotal){
+        this.fortunaTotal = fortunaTotal;
+    }
+    public void setComproCasillaTurno(int comproCasillaTurno){
+        this.comproCasillaTurno = comproCasillaTurno;
+    }
 
     //CONSTRUCTOR
     //Cada vez que creemos un jugador se creará también un avatar.
@@ -143,6 +201,17 @@ public class Jugador {
         inicializarCasillasPasadas();
         setIndiceDados(0);
         setVueltasCompletadas(0);
+        setComproCasillaTurno(0);
+        //estadisticas
+        setDineroInvertido(0);
+        setPagoTasasEImpuestos(0);
+        setPagoAlquileres(0);
+        setCobroAlquileres(0);
+        setCobroPremiosOBote(0);
+        setPasarPorCasillaSalida(0);
+        setVecesCarcel(0);
+        setVecesDados(0);
+        setFortunaTotal(0);
     }
 
     //PARA CREAR EL JUGADOR ESPECIAL BANCA PODEMOS HACER UNA SOBRECARGA DE CONSTRUCTORES
@@ -160,12 +229,30 @@ public class Jugador {
         }
     }
 
-    // Método para recibir un pago
-    public void recibirPago(int monto) {
-        dinero += monto;
+    //OTRO MÉTODO CONSTRUCTOR PERO PASANDO TABLERO:
+    public Jugador(String nombre, String piezaAvatar, Tablero tablero) {
+        setCasillaDeJugador(tablero.getCasilla(0));
+        setNombre(nombre);
+        setAvatar(new Avatar(this, tablero.getCasilla(0), piezaAvatar));
+        setDinero((int) ((Tablero.getValorSumaSolares()) / 3));
+        propiedades = new ArrayList<Casilla>(22);
+        monopolioColor = new ArrayList<String>(8);
+        casillasPasadas = new ArrayList<Integer>(40);
+        inicializarCasillasPasadas();
+        setIndiceDados(0);
+        setVueltasCompletadas(0);
+        setComproCasillaTurno(0);
+        //estadisticas
+        setDineroInvertido(0);
+        setPagoTasasEImpuestos(0);
+        setPagoAlquileres(0);
+        setCobroAlquileres(0);
+        setCobroPremiosOBote(0);
+        setPasarPorCasillaSalida(0);
+        setVecesCarcel(0);
+        setVecesDados(0);
+        setFortunaTotal(0);
     }
-
-
 
     // Método para verificar si el jugador tiene una carta de suerte
     public boolean tieneCartaSuerte() {
@@ -192,7 +279,24 @@ public class Jugador {
         System.out.println("2. Declararte en bancarrota");
         //Volver al menu de casillaCamprables
         System.out.println("3. Volver al menú");
-        int opcion = scanner.nextInt();
+        int opcion;
+        // Mientras la entrada no sea un número o esté fuera del rango 1-3, sigue pidiendo input.
+        while (true) {
+            // Verifica si la entrada es un número entero.
+            if (scanner.hasNextInt()) {
+                opcion = scanner.nextInt();
+
+                // Verifica si la opción está en el rango 1-3.
+                if (opcion >= 1 && opcion <= 3) {
+                    break; // Sale del bucle si la opción es válida.
+                } else {
+                    System.out.println("Por favor, introduce una opción válida del 1 al 3.");
+                }
+            } else {
+                System.out.println("Por favor, introduce un número válido.");
+                scanner.next(); // Limpia el buffer del scanner antes de la siguiente iteración.
+            }
+        }
 
         switch (opcion) {
             case 1:
@@ -412,9 +516,34 @@ public class Jugador {
     public void actualizarCasillasPasadas(Casilla casilla){
         int indiceCasilla = casilla.getNumCasilla();
         //ArrayList de int con las casillas pasadas
+        casillasPasadas.set(indiceCasilla, getCasillasPasadas().get(indiceCasilla)+1);
+        //System.out.println("El valor de la casilla " + indiceCasilla + " es " + casillasPasadas.get(indiceCasilla));
+    }
 
-        int valor = casillasPasadas.get(indiceCasilla);
-        casillasPasadas.set(indiceCasilla, valor+1);
+    //METODO PARA SABER LAS VECES QUE HAS PASADO POR LA CASILLA POR LA QUE HA PASADO MÁS VECES
+    public int vecesCasillaMasPasada(){
+        int max = 0;
+        int indiceMax = 0;
+        for (int i = 0; i < 40; i++){
+            if (casillasPasadas.get(i) > max){
+                max = casillasPasadas.get(i);
+                indiceMax = i;
+            }
+        }
+        return max;
+    }
+
+    //MÉTODO PARA EL INDICE DE LA CASILLA POR LA QUE HAS PASADO MÁS VECES
+    public int indiceCasillaMasPasada(){
+        int max = 0;
+        int indiceMax = 0;
+        for (int i = 0; i < 40; i++){
+            if (casillasPasadas.get(i) > max){
+                max = casillasPasadas.get(i);
+                indiceMax = i;
+            }
+        }
+        return indiceMax;
     }
 
     //MÉTODO PARA COMPROBAR SI UNA CASILLA PASADA ESTÁ CON EL VALOR DOS (ES DECIR, SI SE HA PASADO DOS VECES POR ELLA)
@@ -427,6 +556,47 @@ public class Jugador {
         else{
             return false;
         }
+    }
+
+    //MÉTODO PARA ACTUALIZAR VECES DADOS
+    public void actualizarVecesDados(){
+        setVecesDados(getVecesDados()+1);
+    }
+
+    //MÉTODO PARA CALCULAR LA FORTUNA TOTAL. HAY QUE TENER EN CUENTA EL VALOR DE LAS EDIFICACIONES Y EL DINERO
+    public void calcularFortunaTotal(){
+        int fortuna = 0;
+        int i = 0;
+        int j = 0;
+        Edificaciones edificacion;
+        //Sumamos el dinero
+        fortuna = getDinero();
+        //Iteramos sobre las propiedades del jugador:
+        for (i = 0; i < propiedades.size(); i++){
+
+            //Accedemos a las edificaciones si es un GrupoSolar
+            if (propiedades.get(i).getGrupoCasilla().equals("Solar")){
+                //Sumamos el valor de la propiedad
+                fortuna = fortuna + propiedades.get(i).getGrupoSolar().getValor();
+
+                //Accedemos a edificaciones:
+                edificacion = propiedades.get(i).getGrupoSolar().getEdificaciones();
+                fortuna = fortuna + ((edificacion.getCosteCasas() * edificacion.getNumCasas()) + (edificacion.getNumHoteles() *
+                        edificacion.getCosteHoteles()) + (edificacion.getNumPiscinas() * edificacion.getCostePiscinas()) +
+                        (edificacion.getCostePistasDeporte() * edificacion.getNumPistasDeporte()));
+
+
+            }
+            if(propiedades.get(i).getGrupoCasilla().equals("Transporte")){
+                //Sumamos el valor de la propiedad
+                fortuna = fortuna + propiedades.get(i).getGrupoTransporte().getValor();
+            }
+            if(propiedades.get(i).getGrupoCasilla().equals("Servicios")){
+                //Sumamos el valor de la propiedad
+                fortuna = fortuna + propiedades.get(i).getGrupoServicios().getValor();
+            }
+        }
+        setFortunaTotal(fortuna);
     }
 
     //MÉTODO PARA VER SI PUEDES CONTRUIR

@@ -3,7 +3,9 @@ package paquetePartida;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.Scanner;
 import paqueteCasillas.Casilla;
+import paqueteCasillas.Tablero;
 
 public class Avatar {
 
@@ -84,5 +86,28 @@ public class Avatar {
                 + "}");
 
         return avatarString;
+    }
+
+    //Método para preguntar tipo de movimiento si el tipo del avatar es coche o pelota
+    public String preguntarTipoMovimiento(){
+        if(getTipoAvatar().equals("coche")||getTipoAvatar().equals("pelota")){
+            System.out.println("¿Qué tipo de movimiento quieres hacer?");
+            System.out.println("1. Movimiento basico");
+            System.out.println("2. Movimiento avanzado");
+            Scanner scanner = new Scanner(System.in);
+            int opcion = scanner.nextInt();
+            if(opcion == 1){
+                //Movimiento basico
+                return "basico";
+            }
+            else if(opcion == 2){
+                //Movimiento avanzado
+                return "avanzado";
+            }
+            else{
+                System.out.println("Opción no válida");
+            }
+        }
+        return "basico";
     }
 }

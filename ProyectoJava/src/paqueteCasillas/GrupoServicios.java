@@ -11,6 +11,8 @@ public class GrupoServicios {
     private int valor; //Su valor inicial debe de ser el 0.75 de la cantidad que recibe el jugador en Salida
     private int alquiler;//Depende del valor de los dadosy el numero de servicios
     private int factorServicio; //200 veces menos que la cantiadad que recibe el juagador en Salida
+    private int dineroRecaudado;
+    private boolean esHipotecada;
 
     //GETTERS
 
@@ -29,6 +31,10 @@ public class GrupoServicios {
     public int getFactorServicio() {
         return factorServicio;
     }
+    public int getDineroRecaudado() {
+        return dineroRecaudado;
+    }
+    public boolean getEsHipotecada(){return esHipotecada;}
 
     //SETTERS
     public void setCasilla(Casilla casilla) {
@@ -50,6 +56,10 @@ public class GrupoServicios {
     public void setFactorServicio(int factorServicio) {
         this.factorServicio = factorServicio;
     }
+    public void setDineroRecaudado(int dineroRecaudado) {
+        this.dineroRecaudado = dineroRecaudado;
+    }
+    public void setEsHipotecada(boolean esHipotecada){this.esHipotecada = esHipotecada;}
 
     //CONTRUCTOR
     public GrupoServicios(Casilla casilla,int cantidadPorVuelta){
@@ -58,6 +68,7 @@ public class GrupoServicios {
 
         //Aqui va el metodo para calcular el valor
         setValor(valorServicio(cantidadPorVuelta));
+        setDineroRecaudado(0);
     }
     //METODO PARA EL VALOR
     public int valorServicio(int cantidadPorVuelta){ //Su valor debe de ser el 0.75 de la cantidad que recibe el jugador en Salida
@@ -76,7 +87,7 @@ public class GrupoServicios {
     }
 
     //METODO PARA COBRAR EL ALQUILER
-    public void cobrarAlquiler(Jugador jugador){
+    public void cobrarAlquiler(EstadoPartida estadoPartida, Jugador jugador){
         Jugador jugadorAux = getPropietario();
         //checkeo de si se puede pagar o no
         if(jugador.getDinero() - getAlquiler() < 0){
@@ -84,6 +95,13 @@ public class GrupoServicios {
         }
         jugador.setDinero(jugador.getDinero() - getAlquiler());
         jugadorAux.setDinero(jugadorAux.getDinero() + getAlquiler());
+
+        //Estadística pagoAlquileres
+        jugador.setPagoAlquileres(jugador.getPagoAlquileres() + getAlquiler());
+        //Estadistica cobroAlquileres
+        jugadorAux.setCobroAlquileres(jugadorAux.getCobroAlquileres() + getAlquiler());
+        //estadística dineroRecaudado
+        setDineroRecaudado(getDineroRecaudado() + getAlquiler());
     }
 
     //METODO PARA COMPRAR UN SERVICIO
@@ -98,9 +116,12 @@ public class GrupoServicios {
         if(respuesta.equals("S")){
             //checkeo de si se puede pagar o no
             if((jugador.getDinero() - getValor()) < 0){
-                jugador.noDinero();
+                System.out.println("No tienes suficiente dinero para comprar la casilla " + getCasilla().getNombreCasilla() + "\n");
             }
             else{
+                //estadística de dinero invertido en propiedades
+                jugador.setDineroInvertido(jugador.getDineroInvertido()+getValor());
+                jugador.setComproCasillaTurno(1);
                 jugador.setDinero(jugador.getDinero() - getValor());
                 jugador.anadirPropiedad(casilla);
                 setPropietario(jugador);

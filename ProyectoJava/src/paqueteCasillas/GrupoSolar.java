@@ -15,6 +15,8 @@ public class GrupoSolar {
     private int valor;
     private int alquiler; //debe ser 10% de precio inicial
     private Edificaciones edificaciones;
+    private int dineroRecaudado;
+    private boolean esHipotecada;
 
 
     //GETTERS
@@ -34,6 +36,10 @@ public class GrupoSolar {
     public Edificaciones getEdificaciones() {
         return edificaciones;
     }
+    public int getDineroRecaudado() {
+        return dineroRecaudado;
+    }
+    public boolean getEsHipotecada(){return esHipotecada;}
 
 
     //SETTERS
@@ -55,7 +61,10 @@ public class GrupoSolar {
     public void setEdificaciones(Edificaciones edificaciones) {
         this.edificaciones = edificaciones;
     }
-
+    public void setDineroRecaudado(int dineroRecaudado) {
+        this.dineroRecaudado = dineroRecaudado;
+    }
+    public void setEsHipotecada(boolean esHipotecada){this.esHipotecada = esHipotecada;}
 
 
     //CONSTRUCTOR - TENEMOS QUE ASIGNAR COLORES
@@ -66,6 +75,7 @@ public class GrupoSolar {
         setColorSolar(color);
         setPropietario(EstadoPartida.getBanca());   //----------- BANCA ------------------------
         edificaciones = new Edificaciones(this);
+        setDineroRecaudado(0);
         //Método para calcular el valor:
         valorPorColor(color);
     }
@@ -151,13 +161,16 @@ public class GrupoSolar {
         if(respuesta.equals("S")){
             //Chequeo
             if(jugador.getDinero() - getValor() < 0){
-                jugador.noDinero();
+                System.out.println("No tienes suficiente dinero para comprar la casilla " + getCasilla().getNombreCasilla() + "\n");
             }
             else {
+                //Actualizar estadística de dinero invertido en propiedades
+                jugador.setDineroInvertido(jugador.getDineroInvertido()+getValor());
                 //Comprar propiedad
                 jugador.setDinero(jugador.getDinero() - getValor());
                 jugador.anadirPropiedad(casilla);
                 setPropietario(jugador);
+                jugador.setComproCasillaTurno(1);
                 System.out.println("Has comprado la casilla " + getCasilla().getNombreCasilla() + " por " + getValor() + " €\n");
                 //Checkear si tienen monopolio con calcularMonopolio. Si hay nuevo monopolio se imprime, y si no no
                 if (jugador.calcularMonopolio() == 1) {
@@ -172,7 +185,7 @@ public class GrupoSolar {
     }
 
     //MÉTODO COBRAR ALQUILER
-    public void pagarAlquiler(Jugador jugador){
+    public void pagarAlquiler(EstadoPartida estadoPartida,Jugador jugador){
 
         //Variable
         int alquilerActualizado = getAlquilerActualizado();
@@ -189,6 +202,15 @@ public class GrupoSolar {
 
         //Sumamos el dinero al jugador propietario:
         jugadorPropietario.setDinero(jugadorPropietario.getDinero() + alquilerActualizado);
+
+        //Estadística pagoAlquileres
+        jugador.setPagoAlquileres(jugador.getPagoAlquileres() + alquilerActualizado);
+
+        //Estadistica cobroAlquileres
+        jugadorPropietario.setCobroAlquileres(jugadorPropietario.getCobroAlquileres() + alquilerActualizado);
+
+        //Estadistica dineroRecaudado
+        setDineroRecaudado(getDineroRecaudado() + alquilerActualizado);
     }
 
 

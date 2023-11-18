@@ -39,6 +39,8 @@ public class GrupoParking {
             //Imprimir el precio del bote
             System.out.println("Has recibido un bote de: " + getBote()+" €. ENHORABUENA!!!");
             jugador.setDinero(jugador.getDinero() + getBote());
+            //estadísticas premios o bote
+            jugador.setCobroPremiosOBote(jugador.getCobroPremiosOBote() + getBote());
             ponerACeroMultaAcumulada();
             setBote(0);
         }else{

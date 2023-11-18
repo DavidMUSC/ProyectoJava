@@ -51,18 +51,22 @@ public class GrupoSalida {
         jugador.setDinero(jugador.getDinero() + cantidadPorVuelta);
         System.out.println(jugador.getNombre() + " ha completado una vuelta al tablero y ha recibido " + cantidadPorVuelta + " de dinero.");
         jugador.incrementarVueltasCompletadas();
+        //estadistica Pasar por casilla salida
+        jugador.setPasarPorCasillaSalida(jugador.getPasarPorCasillaSalida()+cantidadPorVuelta);
     }
 
     //METODO PARA ACTUALIZAR PRECIO SOLARES
     public void aumentarPreciosCompraSolares(Jugador jugador, Tablero tablero) {
+
         for (int i = 0; i < 40; i++) {
             Casilla casilla = tablero.getCasilla(i);
             if (casilla.getGrupoCasilla().equals("Solar")) {
                 tablero.getCasilla(i).getGrupoSolar().actualizarValor();
             }
         }
+        jugador.setVueltasCompletadas(0);
         System.out.println("Todos los precios de compra de solares han aumentado en un 5%.");
-    }
 
+    }
 
 }

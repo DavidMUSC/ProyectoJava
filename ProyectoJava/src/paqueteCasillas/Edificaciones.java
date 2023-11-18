@@ -2,10 +2,8 @@ package paqueteCasillas;
 
 import paquetePartida.Jugador;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Scanner;
-
-//TODO: Hacer identificadores que vayan en funcion del orden con el que has edificado
 
 public class Edificaciones {
 
@@ -153,8 +151,10 @@ public class Edificaciones {
             setNumCasas(getNumCasas() + 1);
             //Creamos un nuevo ID:
             crearIds("Casa");
-
             //No hace falta actualizar el alquiler, se va actualizando dinámicamente al pedirlo.
+
+            //actualizar estadisticas de dineroInvertido
+            propietario.setDineroInvertido(propietario.getDineroInvertido() + getCosteCasas());
         }
     }
 
@@ -179,8 +179,24 @@ public class Edificaciones {
                 return;
             }
 
-            //Si hay 4 casas, las eliminamos
+            //Si hay 4 casas, las eliminamos, junto a sus IDS
             setNumCasas(getNumCasas() - 4);
+
+            //Eliminamos 4 IDS de casa:
+            int flag = 0;
+            int i = 0;
+
+            //While
+            while (flag!=4){
+                //Si encontramos una id de casa, la eliminamos y no actualizamos i:
+                if (getIds().get(i).startsWith("casa-")){
+                    getIds().remove(i);
+                    flag++;
+                }
+                else{
+                    i++;
+                }
+            }
 
             //Sumamos 1 hotel:
             setNumHoteles(getNumHoteles() + 1);
@@ -191,6 +207,9 @@ public class Edificaciones {
             propietario.setDinero(propietario.getDinero() - getCosteHoteles());
             System.out.println("Has construido un hotel por " + getCosteHoteles() + " €");
             //No hace falta actualizar el alquiler, se va actualizando dinámicamente al pedirlo.
+
+            //actualizar estadisticas de dineroInvertido
+            propietario.setDineroInvertido(propietario.getDineroInvertido() + getCosteHoteles());
         }
     }
 
@@ -224,6 +243,9 @@ public class Edificaciones {
             propietario.setDinero(propietario.getDinero() - getCostePiscinas());
             System.out.println("Has construido una piscina por " + getCostePiscinas() + " €");
             //No hace falta actualizar el alquiler, se va actualizando dinámicamente al pedirlo.
+
+            //actualizar estadisticas de dineroInvertido
+            propietario.setDineroInvertido(propietario.getDineroInvertido() + getCostePiscinas());
         }
     }
 
@@ -239,6 +261,7 @@ public class Edificaciones {
         //Chequeamos que haya suficiente dinero
         if (propietario.getDinero() < getCostePistasDeporte()){
             System.out.println("Tienes " + propietario.getDinero() + " € y construir una pista de deporte aquí vale " + getCostePistasDeporte() + " €.");
+            return;
         }
         else {
             //Chequeamos si hay 2 hoteles construidos previamente:
@@ -257,6 +280,9 @@ public class Edificaciones {
             propietario.setDinero(propietario.getDinero() - getCostePistasDeporte());
             System.out.println("Has construido una pista de deportes por " + getCostePistasDeporte() + " €");
             //No hace falta actualizar el alquiler, se va actualizando dinámicamente al pedirlo.
+
+            //actualizar estadisticas de dineroInvertido
+            propietario.setDineroInvertido(propietario.getDineroInvertido() + getCostePistasDeporte());
         }
     }
 
@@ -376,6 +402,7 @@ public class Edificaciones {
                 getIds().add(stringAux);
                 //Actualizamos el atributo static:
                 setnIdsCasas(getnIdsCasas()+1);
+                break;
 
             //HOTEL
             case "Hotel":
@@ -387,6 +414,7 @@ public class Edificaciones {
                 getIds().add(stringAux);
                 //Actualizamos el atributo static:
                 setnIdsHoteles(getnIdsHoteles()+1);
+                break;
 
             //PISCINA
             case "Piscina":
@@ -398,6 +426,7 @@ public class Edificaciones {
                 getIds().add(stringAux);
                 //Actualizamos el atributo static:
                 setnIdsPiscinas(getnIdsPiscinas()+1);
+                break;
 
             //PISTA DE DEPORTE
             case "PistaDeporte":
@@ -409,9 +438,81 @@ public class Edificaciones {
                 getIds().add(stringAux);
                 //Actualizamos el atributo static:
                 setnIdsPistasDeporte(getnIdsPistasDeporte()+1);
+                break;
 
         }
 
+    }
+
+    //Método auxiliar para listar todas las edificaciones de una instancia de Edificaciones:
+    public void listarEdificaciones1Casilla(){
+
+        //Variables
+        int numTotalEdificaciones = getNumCasas() + getNumHoteles() + getNumPiscinas() + getNumPistasDeporte();
+        int i = 0;
+        String stringAux;
+        int opcion = 0; // 1: Casa; 2: Hotel, 3: Piscina, 4: Pista de deportes
+        int coste = 0;
+
+        //Si no hay ningún edificio construido, se retorna:
+        if (numTotalEdificaciones == 0) return;
+
+        //Iteramos N (número de edificaciones) veces sobre los ids:
+        for (i = 0; i < numTotalEdificaciones; i++){
+
+            //Determinamos propiedad dependiendo del ID:
+            stringAux = getIds().get(i);
+
+            //Necesitamos saber el coste de cada tipo de edificacion:
+            //Casa
+            if (stringAux.startsWith("casa-")) opcion = 1;
+            //Hotel
+            if (stringAux.startsWith("hotel-")) opcion = 2;
+            //Piscina
+            if (stringAux.startsWith("piscina-")) opcion = 3;
+            //Pista de deportes
+            if (stringAux.startsWith("deporte-")) opcion = 4;
+
+            //Switch:
+            switch (opcion){
+                //Casa
+                case 1:
+                    coste = getCosteCasas();
+                    break;
+                //Hoteles
+                case 2:
+                    coste = getCosteHoteles();
+                    break;
+                //Piscina:
+                case 3:
+                    coste = getCostePiscinas();
+                    break;
+                //Pistas deporte:
+                case 4:
+                    coste = getCostePistasDeporte();
+                    break;
+                //Error:
+                default:
+                    System.out.println("Error al elegir opcion en listarEdificaciones1Casilla.\n");
+                    break;
+            }
+
+            //Imprimimos id, propietario, casilla y grupo:
+            System.out.println("{\n\tid: " + stringAux + ",\n\tpropietario: " + getGrupoSolar().getPropietario().getNombre() +
+                    ",\n\tcasilla: " + getGrupoSolar().getCasilla().getNombreCasilla() + ",\n\tgrupo: " +
+                    getGrupoSolar().getColorSolar() + ",\n\tcoste: " + coste + "\n},\n");
+        }
+    }
+
+    //Método auxiliar para determinar si hay alguna edificacion construida:
+    public boolean esVacioEdificaciones(){
+        //Variable
+        int contador = 0;
+        //Sumamos el número de edificaciones ya construidas:
+        contador = getNumCasas() + getNumHoteles() + getNumPiscinas() + getNumPistasDeporte();
+        //Si contador = 0, no hay ninguna edificacion:
+        if (contador == 0) return true;
+        else return false;
     }
 
 }

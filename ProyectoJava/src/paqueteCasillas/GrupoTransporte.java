@@ -12,6 +12,8 @@ public class GrupoTransporte {
     private Jugador propietario;
     private int valor;
     private int alquiler;
+    private int dineroRecaudado;
+    private boolean esHipotecada;
 
 
     //GETTERS
@@ -28,6 +30,10 @@ public class GrupoTransporte {
     public int getAlquiler() {
         return alquiler;
     }
+    public int getDineroRecaudado() {
+        return dineroRecaudado;
+    }
+    public boolean getEsHipotecada(){return esHipotecada;}
 
 
     //SETTERS
@@ -67,7 +73,10 @@ public class GrupoTransporte {
             this.valor = valor;
         }
     }
-
+    public void setDineroRecaudado(int dineroRecaudado) {
+        this.dineroRecaudado = dineroRecaudado;
+    }
+    public void setEsHipotecada(boolean esHipotecada){this.esHipotecada = esHipotecada;}
 
 
     //CONSTRUCTOR - TENEMOS QUE ASIGNAR COLORES
@@ -79,6 +88,7 @@ public class GrupoTransporte {
         setDineroSalida(dineroSalida);
         setValor(dineroSalida);
         setAlquiler((int)(dineroSalida*0.25));
+        setDineroRecaudado(0);
     }
 
 
@@ -101,10 +111,13 @@ public class GrupoTransporte {
         if(respuesta.equals("S")){
             //Chequeo
             if((jugador.getDinero() - getValor()) < 0){
-                jugador.noDinero();
+                System.out.println("No tienes suficiente dinero para comprar la casilla " + getCasilla().getNombreCasilla() + "\n");
             }
             else{
+                //estadísticas del jugador dineroInvertido
+                jugador.setDineroInvertido(jugador.getDineroInvertido() + getValor());
                 jugador.setDinero(jugador.getDinero() - getValor());
+                jugador.setComproCasillaTurno(1);
                 jugador.anadirPropiedad(casilla);
                 setPropietario(jugador);
                 System.out.println("Has comprado la casilla " + getCasilla().getNombreCasilla() + " por " +
@@ -117,21 +130,28 @@ public class GrupoTransporte {
     }
 
     //MÉTODO COBRAR ALQUILER
-    public void cobrarAlquiler(Jugador jugador){
+    public void cobrarAlquiler(EstadoPartida estadoPartida, Jugador jugador){
 
         //Actualizamos el coste de alquiler
         Jugador jugadorAux = getPropietario();
         //Chequeo que se pueda pagar o no:
         if(jugador.getDinero() - getAlquiler() < 0){
-            jugador.noDinero();
+            jugador.noDinero(estadoPartida, jugadorAux);
         }
 
         jugador.setDinero(jugador.getDinero() - getAlquiler());
         jugadorAux.setDinero(jugadorAux.getDinero() + getAlquiler());
+
+        //Estadística pagoAlquileres
+        jugador.setPagoAlquileres(jugador.getPagoAlquileres() + getAlquiler());
+        //Estadistica cobroAlquileres
+        jugadorAux.setCobroAlquileres(jugadorAux.getCobroAlquileres() + getAlquiler());
+
+        //Estadística dineroRecaudado
+        setDineroRecaudado(getDineroRecaudado() + getAlquiler());
+
         //PRINTEAR QUE SE HA PAGADO EL ALQUILER
         System.out.println("Has pagado " + getAlquiler() + " € de alquiler a " + getPropietario().getNombre());
-
-
     }
 
     //METODO PARA HALLAR CUANTAS PROPIEDADES TRANSPORTE TIENE UN JUGADOR
